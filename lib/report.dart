@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:html';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
  import 'package:location/location.dart';
@@ -17,6 +15,8 @@ class _reportPageState extends State<report> {
     StreamSubscription<Map<String,double>> locationSubscription;
     Location location = new Location();
     String error;
+
+    
   @override
   Widget build(BuildContext context) {
     return Scaffold(
