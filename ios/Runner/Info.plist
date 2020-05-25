@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+LSRequiresIPhoneOS<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
@@ -22,6 +22,15 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Allow this App to access your location?</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>Allow this App to access your location?</string>
+	<key>NSLocationUsageDescription</key>
+	<string>Allow this App to access your location?</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Allow this App to access your location only when the app is in use?</string>
+
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
