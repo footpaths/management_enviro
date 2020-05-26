@@ -2,6 +2,7 @@ import 'package:environmental_management/home.dart';
 import 'package:environmental_management/report.dart';
 import 'package:environmental_management/second_page.dart';
 import 'package:flutter/material.dart';
+import 'package:multi_image_picker/multi_image_picker.dart';
 
 import 'bottom_nav/fancy_bottom_navigation.dart';
 void main() => runApp(MyApp());
@@ -79,21 +80,10 @@ class _MyHomePageState extends State<MyHomePage> {
         return home();
       case 1:
         return  report();
+      case 2:
+        return  report();
       default:
-        return Column(
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            Text("This is the basket page"),
-            RaisedButton(
-              child: Text(
-                "Start new page",
-                style: TextStyle(color: Colors.white),
-              ),
-              color: Theme.of(context).primaryColor,
-              onPressed: () {},
-            )
-          ],
-        );
+        return  report();
     }
   }
 }
