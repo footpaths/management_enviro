@@ -18,6 +18,7 @@ class _reportPageState extends State<report> {
   List<Asset> images = List<Asset>();
   String _error;
   bool _validate = false;
+  bool _validatePhone = false;
 
   @override
   void initState() {
@@ -56,23 +57,25 @@ class _reportPageState extends State<report> {
       _error = error;
     });
   }
+
   void _showcontent() {
     showDialog(
       context: context, barrierDismissible: false, // user must tap button!
 
       builder: (BuildContext context) {
         return new AlertDialog(
-          title: new Text('You clicked on'),
+
+          title: new Text('Xác nhận!!!',style: TextStyle(color: Colors.red),),
           content: new SingleChildScrollView(
             child: new ListBody(
               children: [
-                new Text('Họ tên: '+ _userController.text),
+                new Text('Họ tên: ' + _userController.text),
                 SizedBox(height: 10),
-                new Text('Phone: '+ _phoneController.text),
+                new Text('Phone: ' + _phoneController.text),
                 SizedBox(height: 10),
-                new Text('địa chỉ: '+ _locationMessage),
+                new Text('địa chỉ: ' + _locationMessage),
                 SizedBox(height: 10),
-                new Text('và file hình ảnh đính kèm'),
+                new Text('và ảnh đã chọn'),
               ],
             ),
           ),
@@ -94,6 +97,7 @@ class _reportPageState extends State<report> {
       },
     );
   }
+
   Widget buildGridView() {
     return GridView.count(
       crossAxisCount: 3,
@@ -101,44 +105,15 @@ class _reportPageState extends State<report> {
         Asset asset = images[index];
         return AssetThumb(
           asset: asset,
-          width: 300,
-          height: 300,
+          width: 200,
+          height: 200,
         );
       }),
     );
   }
-  checkTextFieldEmptyOrNot(){
-
-    // Creating 3 String Variables.
-    String text1,text2,text3 ;
-
-    // Getting Value From Text Field and Store into String Variable
-    text1 = _userController.text ;
-    text2 = _phoneController.text ;
 
 
-    // Checking all TextFields.
-    if(text1 == '')
-    {
-      // Put your code here which you want to execute when Text Field is Empty.
-      print('Text Field is empty, Please Fill All Data');
-      setState(() {
-        _userController.text.isEmpty ? _validate = true : _validate = false;
-       });
 
-
-    }else if(text2 == ''){
-      setState(() {
-        _phoneController.text.isEmpty ? _validate = true : _validate = false;
-      });
-
-    }else{
-
-      _showcontent();
-
-    }
-
-  }
   void _getCurrentLocation() async {
     final Position position = await Geolocator()
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
@@ -150,11 +125,10 @@ class _reportPageState extends State<report> {
 
     setState(() {
       _locationMessage = "${first.addressLine}";
-       // print("${first.featureName} : ${first.addressLine}");
-
+      // print("${first.featureName} : ${first.addressLine}");
     });
-
   }
+
   @override
   void dispose() {
     // Clean up the controller when the widget is disposed.
@@ -165,239 +139,139 @@ class _reportPageState extends State<report> {
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            //Header Container
 
-
-    return DefaultTextStyle(
-      style: Theme.of(context).textTheme.bodyText2,
-      child: LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints viewportConstraints) {
-          return SingleChildScrollView(
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                minHeight: viewportConstraints.maxHeight,
-
-              ),
-              child: Column(
-
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-
-                children: <Widget>[
-                  Container(
-
-                    child: Text(
-                      'Thông tin báo cáo',
-                      style: TextStyle(
-                          fontWeight: FontWeight.bold, fontSize: 24.0),
-                    ),
-                   ),
-                  SizedBox(height: 10),
-
-                  Container(
-
-                    margin: const EdgeInsets.only(left: 40,right: 40),
-                    child: TextField(
-                      controller: _userController,
-
-                      //controller: _controller,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Họ tên',
-                        errorText: _validate ? 'Value Can\'t Be Empty' : null,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                  Container(
-                    margin: const EdgeInsets.only(left: 40,right: 40),
-                    child: TextField(
-                      controller: _phoneController,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Số điện thoại',
-                        errorText: _validate ? 'Value Can\'t Be Empty' : null,
-                      ),
-
-                    ),
-                  ),
-                  SizedBox(height: 10),
-                 Container(
-                   margin: const EdgeInsets.only(left: 40,right: 40),
-                   child: Text(_locationMessage),
-                 ),
-                  SizedBox(height: 10),
-                  Container(
-                     margin: const EdgeInsets.only(left: 40,right: 40),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-
+            //Body Container
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 30.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    SizedBox(height: 50),
+                    Container(
+                      child: Column(
                         children: <Widget>[
-                          RaisedButton(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(18.0),
-                                side: BorderSide(color: Colors.red)),
-                            onPressed: () {
+                          Container(
+                            child: Text(
+                              'Thông tin báo cáo',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 24.0),
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          Container(
+                            margin: const EdgeInsets.only(left: 40, right: 40),
+                            child: TextField(
+                              controller: _userController,
 
-                              _getCurrentLocation();
-                            },
-                            color: Colors.red,
-                            textColor: Colors.white,
-                            child: Text("Lấy địa chỉ"),
+                              //controller: _controller,
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: 'Họ tên',
+                                errorText:
+                                    _validate ? 'Họ tên không được rỗng' : null,
+                              ),
+                            ),
                           ),
-                          SizedBox(width: 10),
-                          RaisedButton(
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(18.0),
-                                side: BorderSide(color: Colors.red)),
-                            onPressed: () {
-                              loadAssets();
-                            },
-                            color: Colors.red,
-                            textColor: Colors.white,
-                            child: Text("up hình ảnh"),
+                          SizedBox(height: 10),
+                          Container(
+                            margin: const EdgeInsets.only(left: 40, right: 40),
+                            child: TextField(
+                              controller: _phoneController,
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: 'Số điện thoại',
+                                errorText:
+                                _validatePhone ? 'SĐT không được rỗng' : null,
+                              ),
+                            ),
                           ),
+                          SizedBox(height: 10),
+                          Container(
+                            margin: const EdgeInsets.only(left: 40, right: 40),
+                            child: Text(_locationMessage),
+                          ),
+                          SizedBox(height: 10),
+                          Container(
+                            margin: const EdgeInsets.only(left: 40, right: 40),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: <Widget>[
+                                RaisedButton(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(18.0),
+                                      side: BorderSide(color: Colors.red)),
+                                  onPressed: () {
+                                    _getCurrentLocation();
+                                  },
+                                  color: Colors.red,
+                                  textColor: Colors.white,
+                                  child: Text("Lấy địa chỉ"),
+                                ),
+                                SizedBox(width: 10),
+                                RaisedButton(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(18.0),
+                                      side: BorderSide(color: Colors.red)),
+                                  onPressed: () {
+                                    loadAssets();
+                                  },
+                                  color: Colors.red,
+                                  textColor: Colors.white,
+                                  child: Text("up hình ảnh"),
+                                ),
+                              ],
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          Container(
+                            height: 200,
+                              child: buildGridView(),
+
+                          ),SizedBox(height: 20),
+                          Container(
+                            margin: const EdgeInsets.only(left: 40,right: 40),
+                            child: RaisedButton(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(18.0),
+                                  side: BorderSide(color: Colors.red)),
+                              onPressed: () {
+                                setState(() {
+                                  _userController.text.isEmpty ? _validate = true : _validate = false;
+                                  _phoneController.text.isEmpty ? _validatePhone = true : _validatePhone = false;
+                                });
+                                print('kqqqqqqq'+_validate.toString() + " kqqphone: "+_validatePhone.toString());
+                                if(!_validate && !_validatePhone){
+                                  _showcontent();
+                                }
+                                //_showcontent();
+                              },
+                              color: Colors.red,
+                              textColor: Colors.white,
+                              child: Text("Gửi báo cáo"),
+                            ) ,
+                          )
 
                         ],
-
                       ),
-
-                  ),
-
-                  SizedBox(height: 10),
-                  Container(
-                    height: 200,
-                    margin: const EdgeInsets.only(left: 40,right: 40),
-                    child:  Expanded(
-                      child: buildGridView(),
                     ),
-                  ),
-                  SizedBox(height: 20),
-                  Container(
-                    margin: const EdgeInsets.only(left: 40,right: 40),
-                    child: RaisedButton(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18.0),
-                          side: BorderSide(color: Colors.red)),
-                      onPressed: () {
-                        checkTextFieldEmptyOrNot();
-                        //_showcontent();
-                      },
-                      color: Colors.red,
-                      textColor: Colors.white,
-                      child: Text("Gửi báo cáo"),
-                    ) ,
-                  )
-                ],
+                  ],
+                ),
               ),
             ),
-          );
-        },
+
+          ],
+        ),
       ),
     );
 
-    /*Scaffold(
-      body: Center(
-          child: Container(
-          padding: EdgeInsets.only(left: 40.0, right: 40.00),
-       child: SingleChildScrollView(
-         child: ConstrainedBox(
 
-           child: Column(
-             mainAxisSize: MainAxisSize.min,
-             mainAxisAlignment: MainAxisAlignment.spaceAround,
-             children: <Widget>[
-               Container(
-                 // A fixed-height child.
-                 color: const Color(0xffeeee00), // Yellow
-                 height: 120.0,
-                 alignment: Alignment.center,
-                 child: const Text('Fixed Height Content'),
-               ),
-               Container(
-                 // Another fixed-height child.
-                 color: const Color(0xff008000), // Green
-                 height: 120.0,
-                 alignment: Alignment.center,
-                 child: const Text('Fixed Height Content'),
-               ),
-             ],
-           ),
-         ),
-       ),
-
-       */ /* child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Text(
-              'Thông tin báo cáo',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24.0),
-            ),
-            SizedBox(height: 10),
-            TextField(
-              //controller: _controller,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Họ tên',
-              ),
-
-            ),
-            SizedBox(height: 10),
-            TextField(
-              //controller: _controller,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Số điện thoại',
-              ),
-
-            ),
-            SizedBox(height: 10),
-
-            SizedBox(height: 10),
-            Text(_locationMessage),
-            SizedBox(height: 10),
-            Container(
-
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-
-                children: <Widget>[
-                      RaisedButton(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(18.0),
-                            side: BorderSide(color: Colors.red)),
-                        onPressed: () {
-                          _getCurrentLocation();
-                        },
-                        color: Colors.red,
-                        textColor: Colors.white,
-                        child: Text("Lấy địa chỉ"),
-                      ),
-                      SizedBox(width: 10),
-                      RaisedButton(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(18.0),
-                            side: BorderSide(color: Colors.red)),
-                        onPressed: () {
-loadAssets();
-                        },
-                        color: Colors.red,
-                        textColor: Colors.white,
-                        child: Text("up hình ảnh"),
-                      ),
-
-                    ],
-
-              ),
-            ),
-            SizedBox(height: 10),
-            Container(
-              child: Expanded(
-                child: buildGridView(),
-              ),
-            )
-          ],
-        ),*/ /*
-      )),
-    );*/
   }
 }

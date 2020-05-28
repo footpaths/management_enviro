@@ -1,4 +1,5 @@
 import 'package:environmental_management/home.dart';
+import 'package:environmental_management/login.dart';
 import 'package:environmental_management/report.dart';
 import 'package:environmental_management/second_page.dart';
 import 'package:flutter/material.dart';
@@ -52,7 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
               onclick: () {
                 final FancyBottomNavigationState fState =
                     bottomNavigationKey.currentState;
-                fState.setPage(2);
+                fState.setPage(0);
               }),
           TabData(
               iconData: Icons.search,
@@ -61,7 +62,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   .push(MaterialPageRoute(builder: (context) => SecondPage()))),
           TabData(iconData: Icons.person, title: "Basket")
         ],
-        initialSelection: 1,
+        initialSelection: 0,
         key: bottomNavigationKey,
         onTabChangedListener: (position) {
           setState(() {
@@ -81,9 +82,9 @@ class _MyHomePageState extends State<MyHomePage> {
       case 1:
         return  report();
       case 2:
-        return  report();
+        return login();
       default:
-        return  report();
+        return  home();
     }
   }
 }
