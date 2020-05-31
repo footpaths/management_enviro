@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geocoder/geocoder.dart';
+import 'package:intl/intl.dart';
 
 import 'package:multi_image_picker/multi_image_picker.dart';
 
@@ -12,13 +14,17 @@ class report extends StatefulWidget {
 }
 
 class _reportPageState extends State<report> {
-  String _locationMessage = "vui lòng bấm nút lấy địa chỉ";
+  String _locationMessage = "Vui lòng bấm nút lấy địa chỉ";
   final TextEditingController _userController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _noteController = TextEditingController();
   List<Asset> images = List<Asset>();
   String _error;
   bool _validate = false;
   bool _validatePhone = false;
+  String _dropdownValue = 'One';
+//  final databaseReference = FirebaseDatabase.instance.reference();
+
 
   @override
   void initState() {
@@ -57,7 +63,21 @@ class _reportPageState extends State<report> {
       _error = error;
     });
   }
+  void createRecord(){
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat('yyyy-MM-dd – hh:mm').format(now);
+    var _firebaseRef = FirebaseDatabase().reference().child('chats');
+    _firebaseRef.push().set({
+      "name": _userController.text,
+      "timestamp": formattedDate,
+      "phone": _phoneController.text,
+      "note": _noteController.text,
+      "address": _locationMessage,
+      "typeprocess": _dropdownValue,
 
+    });
+
+  }
   void _showcontent() {
     showDialog(
       context: context, barrierDismissible: false, // user must tap button!
@@ -75,6 +95,10 @@ class _reportPageState extends State<report> {
                 SizedBox(height: 10),
                 new Text('địa chỉ: ' + _locationMessage),
                 SizedBox(height: 10),
+                new Text('Loại xử lý: ' + _dropdownValue),
+                SizedBox(height: 10),
+                new Text('Ghi chú: ' + _noteController.text),
+                SizedBox(height: 10),
                 new Text('và ảnh đã chọn'),
               ],
             ),
@@ -83,13 +107,17 @@ class _reportPageState extends State<report> {
             new FlatButton(
               child: new Text('Bỏ qua'),
               onPressed: () {
+
                 Navigator.of(context).pop();
+
               },
             ),
             new FlatButton(
               child: new Text('Đồng ý'),
               onPressed: () {
+                createRecord();
                 Navigator.of(context).pop();
+
               },
             ),
           ],
@@ -140,6 +168,38 @@ class _reportPageState extends State<report> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Hello Appbar"),
+        actions: <Widget>[
+          Padding(
+
+              padding: EdgeInsets.only(right: 20.0, bottom: 10.0,top: 10.0),
+              child: Container(
+                height: 20.0,
+                child: RaisedButton(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18.0),
+                      side: BorderSide(color: Colors.red)),
+                  onPressed: () {
+                    setState(() {
+                      _userController.text.isEmpty ? _validate = true : _validate = false;
+                      _phoneController.text.isEmpty ? _validatePhone = true : _validatePhone = false;
+                    });
+
+                    if(!_validate && !_validatePhone){
+                      _showcontent();
+                    }
+                    //_showcontent();
+                  },
+                  color: Colors.red,
+                  textColor: Colors.white,
+                  child: Text("Gửi báo cáo"),
+                ) ,
+              )
+          ),
+
+        ],
+      ),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -185,6 +245,7 @@ class _reportPageState extends State<report> {
                             margin: const EdgeInsets.only(left: 40, right: 40),
                             child: TextField(
                               controller: _phoneController,
+                              keyboardType: TextInputType.phone,
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(),
                                 labelText: 'Số điện thoại',
@@ -196,7 +257,41 @@ class _reportPageState extends State<report> {
                           SizedBox(height: 10),
                           Container(
                             margin: const EdgeInsets.only(left: 40, right: 40),
-                            child: Text(_locationMessage),
+                            child: TextField(
+                              controller: _noteController,
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(),
+                                labelText: 'Ghi chú',
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          Text("***Vui lòng chọn loại xử lý", style: TextStyle(color: Colors.red),),
+                          Container(
+                            width: 300.0,
+                            margin: const EdgeInsets.only(left: 40, right: 40),
+                            child: DropdownButton<String>(
+                              isExpanded: true,
+                              value: _dropdownValue,
+                              onChanged: (String newValue) {
+                                setState(() {
+                                  _dropdownValue = newValue;
+                                });
+                              },
+                              items: <String>['One', 'Two', 'Free', 'Four']
+                                  .map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              })
+                                  .toList(),
+                            ),
+                          ),
+                          SizedBox(height: 10),
+                          Container(
+                            margin: const EdgeInsets.only(left: 40, right: 40),
+                            child: Text(_locationMessage, style: TextStyle(color: Colors.red),),
                           ),
                           SizedBox(height: 10),
                           Container(
@@ -207,11 +302,11 @@ class _reportPageState extends State<report> {
                                 RaisedButton(
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(18.0),
-                                      side: BorderSide(color: Colors.red)),
+                                      side: BorderSide(color: Colors.green)),
                                   onPressed: () {
                                     _getCurrentLocation();
                                   },
-                                  color: Colors.red,
+                                  color: Colors.green,
                                   textColor: Colors.white,
                                   child: Text("Lấy địa chỉ"),
                                 ),
@@ -219,11 +314,11 @@ class _reportPageState extends State<report> {
                                 RaisedButton(
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(18.0),
-                                      side: BorderSide(color: Colors.red)),
+                                      side: BorderSide(color: Colors.green)),
                                   onPressed: () {
                                     loadAssets();
                                   },
-                                  color: Colors.red,
+                                  color: Colors.green,
                                   textColor: Colors.white,
                                   child: Text("up hình ảnh"),
                                 ),
@@ -235,29 +330,8 @@ class _reportPageState extends State<report> {
                             height: 200,
                               child: buildGridView(),
 
-                          ),SizedBox(height: 20),
-                          Container(
-                            margin: const EdgeInsets.only(left: 40,right: 40),
-                            child: RaisedButton(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(18.0),
-                                  side: BorderSide(color: Colors.red)),
-                              onPressed: () {
-                                setState(() {
-                                  _userController.text.isEmpty ? _validate = true : _validate = false;
-                                  _phoneController.text.isEmpty ? _validatePhone = true : _validatePhone = false;
-                                });
-                                print('kqqqqqqq'+_validate.toString() + " kqqphone: "+_validatePhone.toString());
-                                if(!_validate && !_validatePhone){
-                                  _showcontent();
-                                }
-                                //_showcontent();
-                              },
-                              color: Colors.red,
-                              textColor: Colors.white,
-                              child: Text("Gửi báo cáo"),
-                            ) ,
                           )
+
 
                         ],
                       ),

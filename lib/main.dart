@@ -1,90 +1,20 @@
-import 'package:environmental_management/home.dart';
-import 'package:environmental_management/login.dart';
-import 'package:environmental_management/report.dart';
-import 'package:environmental_management/second_page.dart';
+import 'package:environmental_management/Constants/Constants.dart';
+import 'package:environmental_management/MyHomePage.dart';
+
 import 'package:flutter/material.dart';
-import 'package:multi_image_picker/multi_image_picker.dart';
 
-import 'bottom_nav/fancy_bottom_navigation.dart';
-void main() => runApp(MyApp());
+import 'LoginScreen.dart';
+import 'splash_screen.dart';
+//void main() => runApp(MyApp());
+var routes = <String, WidgetBuilder>{
+  "/home": (BuildContext context) => MyHomePage(true),
+  "/login": (BuildContext context) => LoginScreen(),
+};
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-      ),
-      home: MyHomePage(),
-    );
-  }
-}
+void main() => runApp(new MaterialApp(
+    theme:
+    ThemeData(primaryColor: Colors.green, accentColor: Colors.yellowAccent),
+    debugShowCheckedModeBanner: false,
+    home: SplashScreen(),
+    routes: routes));
 
-class MyHomePage extends StatefulWidget {
-  @override
-  _MyHomePageState createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int currentPage = 0;
-
-  GlobalKey bottomNavigationKey = GlobalKey();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Fancy Bottom Navigation"),
-      ),
-      body: Container(
-        decoration: BoxDecoration(color: Colors.white),
-        child: Center(
-
-          child: _getPage(currentPage)
-
-        ),
-      ),
-      bottomNavigationBar: FancyBottomNavigation(
-        tabs: [
-          TabData(
-              iconData: Icons.home,
-              title: "Home",
-              onclick: () {
-                final FancyBottomNavigationState fState =
-                    bottomNavigationKey.currentState;
-                fState.setPage(0);
-              }),
-          TabData(
-              iconData: Icons.search,
-              title: "Search",
-              onclick: () => Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (context) => SecondPage()))),
-          TabData(iconData: Icons.person, title: "Basket")
-        ],
-        initialSelection: 0,
-        key: bottomNavigationKey,
-        onTabChangedListener: (position) {
-          setState(() {
-            currentPage = position;
-          });
-        },
-      ),
-
-    );
-  }
-
-  _getPage(int page) {
-    print('cu'+currentPage.toString());
-    switch (page) {
-      case 0:
-        return home();
-      case 1:
-        return  report();
-      case 2:
-        return login();
-      default:
-        return  home();
-    }
-  }
-}
