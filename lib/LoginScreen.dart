@@ -157,21 +157,7 @@ class LoginScreenState extends State<LoginScreen> {
                             ) ,
                           ),
 
-                          Container(
-                            margin: const EdgeInsets.only(left: 40,right: 40),
-                            child: RaisedButton(
-                              shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(18.0),
-                                  side: BorderSide(color: Colors.green)),
-                              onPressed: () {
-                                Navigator.of(context).push(new MaterialPageRoute(builder: (_) => new MyHomePage(false)));
-                                //_showcontent();
-                              },
-                              color: Colors.green,
-                              textColor: Colors.white,
-                              child: Text("Đi không cần đăng nhập"),
-                            ) ,
-                          )
+
 
 
                         ],

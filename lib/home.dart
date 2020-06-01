@@ -2,7 +2,7 @@
 import 'dart:async';
  import 'package:multi_image_picker/multi_image_picker.dart';
 
-
+ import 'package:flutter/src/gestures/tap.dart';
 
 
  class home extends StatefulWidget {

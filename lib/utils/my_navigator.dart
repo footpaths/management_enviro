@@ -11,4 +11,14 @@ class MyNavigator {
     Navigator.of(context).pushReplacementNamed('/login');
 
   }
+  static void goToChoose(BuildContext context) {
+
+    Navigator.of(context).pushReplacementNamed('/choose');
+
+  }
+  static void goToReport(BuildContext context) {
+
+    Navigator.of(context).pushNamed('/map');
+
+  }
 }

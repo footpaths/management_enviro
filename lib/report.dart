@@ -29,6 +29,7 @@ class _reportPageState extends State<report> {
   @override
   void initState() {
     super.initState();
+
   }
 
   Future<void> loadAssets() async {
@@ -153,6 +154,7 @@ class _reportPageState extends State<report> {
 
     setState(() {
       _locationMessage = "${first.addressLine}";
+      print('aaaaaa'+_locationMessage);
       // print("${first.featureName} : ${first.addressLine}");
     });
   }
@@ -299,17 +301,7 @@ class _reportPageState extends State<report> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
-                                RaisedButton(
-                                  shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(18.0),
-                                      side: BorderSide(color: Colors.green)),
-                                  onPressed: () {
-                                    _getCurrentLocation();
-                                  },
-                                  color: Colors.green,
-                                  textColor: Colors.white,
-                                  child: Text("Lấy địa chỉ"),
-                                ),
+
                                 SizedBox(width: 10),
                                 RaisedButton(
                                   shape: RoundedRectangleBorder(

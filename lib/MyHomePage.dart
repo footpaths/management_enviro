@@ -5,6 +5,7 @@ import 'Constants/Constants.dart';
 import 'bottom_nav/fancy_bottom_navigation.dart';
 import 'home.dart';
 
+import 'map.dart';
 import 'report.dart';
 
 
@@ -72,7 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
       case 1:
         return report();
       case 2:
-        return report();
+        return HomeMapPage();
       default:
         return home();
     }
