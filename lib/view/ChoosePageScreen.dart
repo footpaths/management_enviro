@@ -1,4 +1,5 @@
- import 'package:environmental_management/utils/my_navigator.dart';
+ import 'package:environmental_management/Constants/icon_image.dart';
+import 'package:environmental_management/utils/my_navigator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -74,6 +75,15 @@ class ChoosePageScreenState extends State<ChoosePageScreen> {
                       child: Column(
                         children: <Widget>[
                           Container(
+                            margin: EdgeInsets.only(top: 10),
+                            child: CircleAvatar(
+                              radius: 50,
+                              backgroundColor: Colors.red,
+                              backgroundImage: AssetImage(PageImage.IC_ADD),
+                            ),
+                          ),
+                          SizedBox(height: 30),
+                          Container(
 
                             margin: const EdgeInsets.only(left: 40,right: 40),
                             width: double.infinity,
@@ -102,7 +112,7 @@ class ChoosePageScreenState extends State<ChoosePageScreen> {
                                   borderRadius: BorderRadius.circular(18.0),
                                   side: BorderSide(color: Colors.brown)),
                               onPressed: () {
-
+                                MyNavigator.goToPDF(context);
                                 //_showcontent();
                               },
                               color: Colors.brown,

@@ -6,30 +6,42 @@ import 'package:flutter/services.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:intl/intl.dart';
 
+
 import 'package:multi_image_picker/multi_image_picker.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class report extends StatefulWidget {
+  final GlobalKey<ScaffoldState> globalKey;
+
+  const report({Key key, this.globalKey}) : super(key: key);
+
   @override
   _reportPageState createState() => _reportPageState();
 }
 
 class _reportPageState extends State<report> {
   String _locationMessage = "Vui lòng bấm nút lấy địa chỉ";
+  String imagesAttach = "và không có ảnh được chọn";
   final TextEditingController _userController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
   List<Asset> images = List<Asset>();
+  List<String> imageUrls = <String>[];
+  List<String> listUrls = <String>[];
   String _error;
   bool _validate = false;
   bool _validatePhone = false;
+  bool _statusProcess = false;
+  bool _selectImages = false;
   String _dropdownValue = 'One';
-//  final databaseReference = FirebaseDatabase.instance.reference();
 
+//  final databaseReference = FirebaseDatabase.instance.reference();
 
   @override
   void initState() {
     super.initState();
-
+    _getCurrentLocation();
   }
 
   Future<void> loadAssets() async {
@@ -64,8 +76,99 @@ class _reportPageState extends State<report> {
       _error = error;
     });
   }
-  void createRecord(){
+
+  Future<dynamic> postImage(Asset imageFile) async {
+    String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+    StorageReference reference = FirebaseStorage.instance.ref().child(fileName);
+    StorageUploadTask uploadTask =
+        reference.putData((await imageFile.getByteData()).buffer.asUint8List());
+    StorageTaskSnapshot storageTaskSnapshot = await uploadTask.onComplete;
+    String imageUrl = await storageTaskSnapshot.ref.getDownloadURL();
+    print('aaaaaaaa' + imageUrl);
+    listUrls.add(imageUrl);
+    print("sizeeeeeeeeeeee" + listUrls.length.toString());
+    if (listUrls.length == images.length) {
+      updateRecord();
+    }
+    return storageTaskSnapshot.ref.getDownloadURL();
+  }
+
+  void uploadImages() {
+    for (var imageFile in images) {
+      postImage(imageFile).then((downloadUrl) {
+        imageUrls.add(downloadUrl.toString());
+        if (imageUrls.length == images.length) {
+          String documnetID = DateTime.now().millisecondsSinceEpoch.toString();
+          Firestore.instance
+              .collection('images')
+              .document(documnetID)
+              .setData({'urls': imageUrls}).then((val) {
+            print('succccccccccccccccccccccccccccccccccccccccccccc');
+            /*SnackBar snackbar = SnackBar(content: Text('Uploaded Successfully'));
+            widget.globalKey.currentState.showSnackBar(snackbar);*/
+
+            setState(() {
+              images = [];
+              imageUrls = [];
+            });
+          });
+        }
+      }).catchError((err) {
+        print(err);
+      });
+    }
+  }
+
+  void updateRecord() {
     DateTime now = DateTime.now();
+    String formattedDate = DateFormat('yyyy-MM-dd – hh:mm').format(now);
+    if (listUrls.length > 0) {
+      
+    }else{
+      listUrls.add("nodata");
+    }
+
+    var _firebaseRef = FirebaseDatabase().reference().child('chats');
+    _firebaseRef.push().set({
+      "name": _userController.text,
+      "timestamp": formattedDate,
+      "phone": _phoneController.text,
+      "note": _noteController.text,
+      "address": _locationMessage,
+      "typeprocess": _dropdownValue,
+      "statusProcess": _statusProcess,
+      "images": listUrls,
+    }).then((val) {
+      print('aaaaaaaaa thanh cong');
+      _showDialogSuccess();
+
+//      Navigator.pop(context);
+
+    });
+    /*  _firebaseRef.push().set(
+        {
+      "name": _userController.text,
+      "timestamp": formattedDate,
+      "phone": _phoneController.text,
+      "note": _noteController.text,
+      "address": _locationMessage,
+      "typeprocess": _dropdownValue,
+      "statusProcess": _statusProcess,
+      "images": listUrls,
+    }
+
+    );*/
+  }
+
+  void createRecord() {
+    if (images.length > 0) {
+      uploadImages();
+    } else {
+      updateRecord();
+//
+    }
+
+    /* DateTime now = DateTime.now();
     String formattedDate = DateFormat('yyyy-MM-dd – hh:mm').format(now);
     var _firebaseRef = FirebaseDatabase().reference().child('chats');
     _firebaseRef.push().set({
@@ -76,8 +179,41 @@ class _reportPageState extends State<report> {
       "address": _locationMessage,
       "typeprocess": _dropdownValue,
 
-    });
+    });*/
+  }
+  void _showDialogSuccess() {
+    showDialog(
+      context: context, barrierDismissible: false, // user must tap button!
 
+      builder: (BuildContext context) {
+        return new AlertDialog(
+          title: Container(
+            alignment: Alignment.center,
+            child: new Text(
+              'Xác nhận!!!',
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+          content: new SingleChildScrollView(
+            child:  Container(
+              alignment: Alignment.center,
+              child: Text("Báo cáo thành công"),
+            )
+          ),
+          actions: [
+
+            new FlatButton(
+              child: new Text('Đồng ý'),
+              onPressed: () {
+
+                Navigator.of(context).pop();
+                Navigator.pop(context);
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
   void _showcontent() {
     showDialog(
@@ -85,8 +221,10 @@ class _reportPageState extends State<report> {
 
       builder: (BuildContext context) {
         return new AlertDialog(
-
-          title: new Text('Xác nhận!!!',style: TextStyle(color: Colors.red),),
+          title: new Text(
+            'Xác nhận!!!',
+            style: TextStyle(color: Colors.red),
+          ),
           content: new SingleChildScrollView(
             child: new ListBody(
               children: [
@@ -100,7 +238,6 @@ class _reportPageState extends State<report> {
                 SizedBox(height: 10),
                 new Text('Ghi chú: ' + _noteController.text),
                 SizedBox(height: 10),
-                new Text('và ảnh đã chọn'),
               ],
             ),
           ),
@@ -108,9 +245,7 @@ class _reportPageState extends State<report> {
             new FlatButton(
               child: new Text('Bỏ qua'),
               onPressed: () {
-
                 Navigator.of(context).pop();
-
               },
             ),
             new FlatButton(
@@ -118,7 +253,6 @@ class _reportPageState extends State<report> {
               onPressed: () {
                 createRecord();
                 Navigator.of(context).pop();
-
               },
             ),
           ],
@@ -128,6 +262,8 @@ class _reportPageState extends State<report> {
   }
 
   Widget buildGridView() {
+    imagesAttach = "và ảnh đã chọn";
+    _selectImages = true;
     return GridView.count(
       crossAxisCount: 3,
       children: List.generate(images.length, (index) {
@@ -141,8 +277,6 @@ class _reportPageState extends State<report> {
     );
   }
 
-
-
   void _getCurrentLocation() async {
     final Position position = await Geolocator()
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
@@ -154,7 +288,7 @@ class _reportPageState extends State<report> {
 
     setState(() {
       _locationMessage = "${first.addressLine}";
-      print('aaaaaa'+_locationMessage);
+      print('aaaaaa' + _locationMessage);
       // print("${first.featureName} : ${first.addressLine}");
     });
   }
@@ -174,8 +308,7 @@ class _reportPageState extends State<report> {
         title: Text("Hello Appbar"),
         actions: <Widget>[
           Padding(
-
-              padding: EdgeInsets.only(right: 20.0, bottom: 10.0,top: 10.0),
+              padding: EdgeInsets.only(right: 20.0, bottom: 10.0, top: 10.0),
               child: Container(
                 height: 20.0,
                 child: RaisedButton(
@@ -184,11 +317,17 @@ class _reportPageState extends State<report> {
                       side: BorderSide(color: Colors.red)),
                   onPressed: () {
                     setState(() {
-                      _userController.text.isEmpty ? _validate = true : _validate = false;
-                      _phoneController.text.isEmpty ? _validatePhone = true : _validatePhone = false;
+                      _userController.text.isEmpty
+                          ? _validate = true
+                          : _validate = false;
+                      _phoneController.text.isEmpty
+                          ? _validatePhone = true
+                          : _validatePhone = false;
                     });
 
-                    if(!_validate && !_validatePhone){
+                    if (!_validate && !_validatePhone) {
+                      FocusScope.of(context).requestFocus(new FocusNode());
+
                       _showcontent();
                     }
                     //_showcontent();
@@ -196,10 +335,8 @@ class _reportPageState extends State<report> {
                   color: Colors.red,
                   textColor: Colors.white,
                   child: Text("Gửi báo cáo"),
-                ) ,
-              )
-          ),
-
+                ),
+              )),
         ],
       ),
       body: SafeArea(
@@ -251,8 +388,9 @@ class _reportPageState extends State<report> {
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(),
                                 labelText: 'Số điện thoại',
-                                errorText:
-                                _validatePhone ? 'SĐT không được rỗng' : null,
+                                errorText: _validatePhone
+                                    ? 'SĐT không được rỗng'
+                                    : null,
                               ),
                             ),
                           ),
@@ -268,7 +406,10 @@ class _reportPageState extends State<report> {
                             ),
                           ),
                           SizedBox(height: 10),
-                          Text("***Vui lòng chọn loại xử lý", style: TextStyle(color: Colors.red),),
+                          Text(
+                            "***Vui lòng chọn loại xử lý",
+                            style: TextStyle(color: Colors.red),
+                          ),
                           Container(
                             width: 300.0,
                             margin: const EdgeInsets.only(left: 40, right: 40),
@@ -280,20 +421,26 @@ class _reportPageState extends State<report> {
                                   _dropdownValue = newValue;
                                 });
                               },
-                              items: <String>['One', 'Two', 'Free', 'Four']
-                                  .map<DropdownMenuItem<String>>((String value) {
+                              items: <String>[
+                                'One',
+                                'Two',
+                                'Free',
+                                'Four'
+                              ].map<DropdownMenuItem<String>>((String value) {
                                 return DropdownMenuItem<String>(
                                   value: value,
                                   child: Text(value),
                                 );
-                              })
-                                  .toList(),
+                              }).toList(),
                             ),
                           ),
                           SizedBox(height: 10),
                           Container(
                             margin: const EdgeInsets.only(left: 40, right: 40),
-                            child: Text(_locationMessage, style: TextStyle(color: Colors.red),),
+                            child: Text(
+                              _locationMessage,
+                              style: TextStyle(color: Colors.red),
+                            ),
                           ),
                           SizedBox(height: 10),
                           Container(
@@ -301,7 +448,6 @@ class _reportPageState extends State<report> {
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
-
                                 SizedBox(width: 10),
                                 RaisedButton(
                                   shape: RoundedRectangleBorder(
@@ -320,11 +466,8 @@ class _reportPageState extends State<report> {
                           SizedBox(height: 10),
                           Container(
                             height: 200,
-                              child: buildGridView(),
-
+                            child: buildGridView(),
                           )
-
-
                         ],
                       ),
                     ),
@@ -332,12 +475,9 @@ class _reportPageState extends State<report> {
                 ),
               ),
             ),
-
           ],
         ),
       ),
     );
-
-
   }
 }

@@ -1,13 +1,11 @@
 import 'dart:async';
 
 import 'package:environmental_management/report.dart';
-import 'package:firebase_database/firebase_database.dart';
+import 'package:environmental_management/utils/my_navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
- import 'package:geolocator/geolocator.dart';
- import 'package:location/location.dart';
+import 'package:location/location.dart';
 
-import 'package:geocoder/geocoder.dart';
 class HomeMapPage extends StatefulWidget {
   @override
   _HomeMapPageState createState() => _HomeMapPageState();
@@ -41,11 +39,11 @@ class _HomeMapPageState extends State<HomeMapPage> {
   }
 
   void _showOverlay(BuildContext context) {
-
-    Navigator.of(context).push(
+    MyNavigator.goToPort(context);
+    /*Navigator.of(context).push(
         new PageRouteBuilder(
             pageBuilder: (BuildContext context, _, __) {
-              return new report();
+              return  report();
             },
             transitionsBuilder: (_, Animation<double> animation, __, Widget child) {
               return new FadeTransition(
@@ -57,7 +55,7 @@ class _HomeMapPageState extends State<HomeMapPage> {
               );
             }
         )
-    );
+    );*/
 
   }
 

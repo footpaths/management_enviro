@@ -21,4 +21,30 @@ class MyNavigator {
     Navigator.of(context).pushNamed('/map');
 
   }
+  static void goToPDF(BuildContext context) {
+
+    Navigator.of(context).pushNamed('/pdf');
+
+  }
+
+  static void goToPort(BuildContext context) {
+    /*Navigator.of(context).push(
+        new PageRouteBuilder(
+            pageBuilder: (BuildContext context, _, __) {
+              return  report();
+            },
+            transitionsBuilder: (_, Animation<double> animation, __, Widget child) {
+              return new FadeTransition(
+                opacity: animation,
+                child: ScaleTransition(
+                  scale: animation,
+                  child: child,
+                ),
+              );
+            }
+        )
+    );*/
+    Navigator.of(context).pushReplacementNamed('/port');
+
+  }
 }

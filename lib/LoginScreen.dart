@@ -138,7 +138,7 @@ class LoginScreenState extends State<LoginScreen> {
                                   signIn(_userController.text, _passController.text).then((user) {
                                     if (user != null) {
                                       print('Logged in successfully.');
-
+                                      MyNavigator.goToHome(context);
                                       /*   setState(() {
 
 //                                        successMessage =
