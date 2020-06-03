@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/material.dart';
@@ -6,10 +7,11 @@ import 'package:flutter/services.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:intl/intl.dart';
 
-
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+
+import 'Constants/Constants.dart';
 
 class report extends StatefulWidget {
   final GlobalKey<ScaffoldState> globalKey;
@@ -22,7 +24,7 @@ class report extends StatefulWidget {
 
 class _reportPageState extends State<report> {
   String _locationMessage = "Vui lòng bấm nút lấy địa chỉ";
-  String imagesAttach = "và không có ảnh được chọn";
+//  String imagesAttach = "và không có ảnh được chọn";
   final TextEditingController _userController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _noteController = TextEditingController();
@@ -34,7 +36,7 @@ class _reportPageState extends State<report> {
   bool _validatePhone = false;
   bool _statusProcess = false;
   bool _selectImages = false;
-  String _dropdownValue = 'One';
+  String _dropdownValue = 'Lấn đất';
 
 //  final databaseReference = FirebaseDatabase.instance.reference();
 
@@ -104,9 +106,6 @@ class _reportPageState extends State<report> {
               .document(documnetID)
               .setData({'urls': imageUrls}).then((val) {
             print('succccccccccccccccccccccccccccccccccccccccccccc');
-            /*SnackBar snackbar = SnackBar(content: Text('Uploaded Successfully'));
-            widget.globalKey.currentState.showSnackBar(snackbar);*/
-
             setState(() {
               images = [];
               imageUrls = [];
@@ -123,8 +122,7 @@ class _reportPageState extends State<report> {
     DateTime now = DateTime.now();
     String formattedDate = DateFormat('yyyy-MM-dd – hh:mm').format(now);
     if (listUrls.length > 0) {
-      
-    }else{
+    } else {
       listUrls.add("nodata");
     }
 
@@ -141,23 +139,9 @@ class _reportPageState extends State<report> {
     }).then((val) {
       print('aaaaaaaaa thanh cong');
       _showDialogSuccess();
-
 //      Navigator.pop(context);
-
     });
-    /*  _firebaseRef.push().set(
-        {
-      "name": _userController.text,
-      "timestamp": formattedDate,
-      "phone": _phoneController.text,
-      "note": _noteController.text,
-      "address": _locationMessage,
-      "typeprocess": _dropdownValue,
-      "statusProcess": _statusProcess,
-      "images": listUrls,
-    }
 
-    );*/
   }
 
   void createRecord() {
@@ -165,26 +149,12 @@ class _reportPageState extends State<report> {
       uploadImages();
     } else {
       updateRecord();
-//
     }
-
-    /* DateTime now = DateTime.now();
-    String formattedDate = DateFormat('yyyy-MM-dd – hh:mm').format(now);
-    var _firebaseRef = FirebaseDatabase().reference().child('chats');
-    _firebaseRef.push().set({
-      "name": _userController.text,
-      "timestamp": formattedDate,
-      "phone": _phoneController.text,
-      "note": _noteController.text,
-      "address": _locationMessage,
-      "typeprocess": _dropdownValue,
-
-    });*/
   }
+
   void _showDialogSuccess() {
     showDialog(
       context: context, barrierDismissible: false, // user must tap button!
-
       builder: (BuildContext context) {
         return new AlertDialog(
           title: Container(
@@ -195,19 +165,30 @@ class _reportPageState extends State<report> {
             ),
           ),
           content: new SingleChildScrollView(
-            child:  Container(
-              alignment: Alignment.center,
-              child: Text("Báo cáo thành công"),
-            )
-          ),
+              child: Container(
+            alignment: Alignment.center,
+            child: Text("Báo cáo thành công"),
+          )),
           actions: [
-
             new FlatButton(
               child: new Text('Đồng ý'),
               onPressed: () {
+                setState(() {
+                  FirebaseAuth.instance.currentUser().then((firebaseUser){
+                    if(firebaseUser == null)
+                    {
+                      //signed out
+                      Navigator.of(context).pop();
+                      Navigator.pop(context);
+                    }
+                    else{
+                      Navigator.pop(context);
 
-                Navigator.of(context).pop();
-                Navigator.pop(context);
+
+                    }
+                  }
+                  );
+                });
               },
             ),
           ],
@@ -215,6 +196,7 @@ class _reportPageState extends State<report> {
       },
     );
   }
+
   void _showcontent() {
     showDialog(
       context: context, barrierDismissible: false, // user must tap button!
@@ -262,7 +244,6 @@ class _reportPageState extends State<report> {
   }
 
   Widget buildGridView() {
-    imagesAttach = "và ảnh đã chọn";
     _selectImages = true;
     return GridView.count(
       crossAxisCount: 3,
@@ -289,7 +270,7 @@ class _reportPageState extends State<report> {
     setState(() {
       _locationMessage = "${first.addressLine}";
       print('aaaaaa' + _locationMessage);
-      // print("${first.featureName} : ${first.addressLine}");
+
     });
   }
 
@@ -422,10 +403,13 @@ class _reportPageState extends State<report> {
                                 });
                               },
                               items: <String>[
-                                'One',
-                                'Two',
-                                'Free',
-                                'Four'
+                                'Lấn đất',
+                                'Chiếm đất',
+                                'Xả rác thải',
+                                'Ô nhiễm không khí',
+                                'Ô nhiễm nước',
+                                'Ô nhiễm tiếng ồn',
+                                'Khai thác cát trái phép'
                               ].map<DropdownMenuItem<String>>((String value) {
                                 return DropdownMenuItem<String>(
                                   value: value,

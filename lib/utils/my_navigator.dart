@@ -26,7 +26,17 @@ class MyNavigator {
     Navigator.of(context).pushNamed('/pdf');
 
   }
+  static void goToFullScreen(BuildContext context,String url) {
 
+    Navigator.of(context).pushNamed('/fullScreen',arguments:{'url': url});
+
+  }
+  static void goToDetails(BuildContext context,String name, String timestamp, String phone, String note,
+      String address, String typeprocess, bool statusProcess, dynamic images) {
+
+    Navigator.of(context).pushNamed('/details',arguments: {'name': name, 'timestamp':timestamp,'phone': phone,'note': note,'address': address,'typeprocess': typeprocess,'statusProcess': statusProcess,'images': images});
+
+  }
   static void goToPort(BuildContext context) {
     /*Navigator.of(context).push(
         new PageRouteBuilder(

@@ -3,10 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-import 'MyHomePage.dart';
-import 'utils/flutkart.dart';
+import 'Constants/Constants.dart';
 import 'utils/my_navigator.dart';
-import 'widgets/walkthrough.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -30,6 +28,7 @@ class LoginScreenState extends State<LoginScreen> {
         else{
           //signed in
           print('roi');
+
           MyNavigator.goToHome(context);
 //          Navigator.of(context).pushReplacementNamed('/login');
 //          Navigator.of(context).push(new MaterialPageRoute(builder: (_) => new MyHomePage()));

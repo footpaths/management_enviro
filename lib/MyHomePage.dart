@@ -1,3 +1,5 @@
+import 'package:environmental_management/view/LogoutScreen.dart';
+import 'package:environmental_management/view/pdfScreen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -27,7 +29,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Future<void> initState()   {
     super.initState();
-
+    print('ttttttttttttttttttttttt'+Constants.ISGOING.toString());
   }
   @override
   Widget build(BuildContext context) {
@@ -53,7 +55,8 @@ class _MyHomePageState extends State<MyHomePage> {
 //              onclick: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => SecondPage()))
 
           ),
-          TabData(iconData: Icons.person, title: "Basket")
+          TabData(iconData: Icons.person, title: "Basket"),
+          TabData(iconData: Icons.exit_to_app, title: "Thoát")
         ],
         initialSelection: 0,
         key: bottomNavigationKey,
@@ -73,7 +76,9 @@ class _MyHomePageState extends State<MyHomePage> {
       case 1:
         return report();
       case 2:
-        return HomeMapPage();
+        return pdfScreen();
+      case 3:
+        return LogoutScreen();
       default:
         return home();
     }

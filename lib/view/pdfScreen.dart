@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:environmental_management/utils/my_navigator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_plugin_pdf_viewer/flutter_plugin_pdf_viewer.dart';
 
@@ -31,6 +33,8 @@ class _pdfScreenState extends State<pdfScreen> {
           child: _isLoading
               ? Center(child: CircularProgressIndicator())
               : PDFViewer(document: document)),
+
+
 
     );
   }

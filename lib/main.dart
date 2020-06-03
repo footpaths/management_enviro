@@ -9,6 +9,8 @@ import 'map.dart';
 import 'report.dart';
 import 'splash_screen.dart';
 import 'view/ChoosePageScreen.dart';
+import 'view/detailsScreen.dart';
+import 'view/fullImagesScreen.dart';
 //void main() => runApp(MyApp());
 var routes = <String, WidgetBuilder>{
   "/home": (BuildContext context) => MyHomePage(true),
@@ -17,6 +19,8 @@ var routes = <String, WidgetBuilder>{
   "/map": (BuildContext context) => HomeMapPage(),
   "/pdf": (BuildContext context) => pdfScreen(),
   "/port": (BuildContext context) => report(),
+  "/details": (BuildContext context) => detailsScreen(),
+  "/fullScreen": (BuildContext context) => FullScreenImg(),
 };
 
 void main() => runApp(new MaterialApp(
