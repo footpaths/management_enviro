@@ -8,7 +8,7 @@ class MyNavigator {
 
   static void goToLogin(BuildContext context) {
 
-    Navigator.of(context).pushReplacementNamed('/login');
+    Navigator.of(context).pushNamed('/login');
 
   }
   static void goToChoose(BuildContext context) {

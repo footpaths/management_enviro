@@ -1,4 +1,6 @@
- import 'package:environmental_management/Constants/icon_image.dart';
+ import 'dart:ui';
+
+import 'package:environmental_management/Constants/icon_image.dart';
 import 'package:environmental_management/utils/my_navigator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -30,8 +32,7 @@ class ChoosePageScreenState extends State<ChoosePageScreen> {
           //signed in
           print('roi'+firebaseUser.email);
           MyNavigator.goToHome(context);
-//          Navigator.of(context).pushReplacementNamed('/login');
-//          Navigator.of(context).push(new MaterialPageRoute(builder: (_) => new MyHomePage()));
+
 
         }
       });
@@ -58,7 +59,7 @@ class ChoosePageScreenState extends State<ChoosePageScreen> {
                     bottom: new Radius.elliptical(
                         MediaQuery.of(context).size.width, 100.0)),
               ),
-              child: Center(child: Text("Tài Nguyên Môi Trường", style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white,fontSize: 24.0),),),
+              child: Center(child: Text("Tài Nguyên Và Môi Trường", style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white,fontSize: 24.0),),),
             ),
             //Header Container
 
@@ -98,7 +99,7 @@ class ChoosePageScreenState extends State<ChoosePageScreen> {
                               },
                               color: Colors.green,
                               textColor: Colors.white,
-                              child: Text("Báo cáo sai phạm môi trường"),
+                              child: Text("PHẢN ÁNH VỀ ĐẤT ĐAI & MÔI TRƯỜNG",textAlign: TextAlign.center,),
                             ) ,
                           ),
                           SizedBox(height: 30),
@@ -117,7 +118,7 @@ class ChoosePageScreenState extends State<ChoosePageScreen> {
                               },
                               color: Colors.brown,
                               textColor: Colors.white,
-                              child: Text("Xem thông tin bản đồ quy hoạch"),
+                              child: Text("XEM THÔNG TIN BẢN ĐỒ QUY HOẠCH",textAlign: TextAlign.center,),
                             ) ,
                           ),
                           SizedBox(height: 10),
@@ -142,6 +143,9 @@ class ChoosePageScreenState extends State<ChoosePageScreen> {
               child: Column(
                 children: <Widget>[
                   Text("Hotline : 0909894347"),
+                  SizedBox(height: 10),
+                  Text("Địa chỉ :  Bình Khánh - Cần Giờ", ),
+                  SizedBox(height: 10),
                   RaisedButton(
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(18.0),
@@ -156,9 +160,7 @@ class ChoosePageScreenState extends State<ChoosePageScreen> {
                 ],
               ),
             ),
-            //Footer Container
-            //Here you will get unexpected behaviour when keyboard pops-up.
-            //So its better to use `bottomNavigationBar` to avoid this.
+
           ],
         ),
       ),

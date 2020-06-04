@@ -53,24 +53,24 @@ class LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
+      appBar: AppBar(
+        title: Center(
+          child: Text('Đăng nhập quản lý'),
+        ),
+
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            bottom: Radius.circular(30),
+          ),
+        ),
+      ),
       body: SafeArea(
 
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            new Container(
-              height: 100.0,
-              decoration: new BoxDecoration(
-                color: Colors.green,
-                boxShadow: [
-                  new BoxShadow(blurRadius: 2.0)
-                ],
-                borderRadius: new BorderRadius.vertical(
-                    bottom: new Radius.elliptical(
-                        MediaQuery.of(context).size.width, 100.0)),
-              ),
-              child: Center(child: Text("Login", style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white,fontSize: 24.0),),),
-            ),
+
             //Header Container
 
             //Body Container
@@ -87,12 +87,12 @@ class LoginScreenState extends State<LoginScreen> {
                         children: <Widget>[
                           Container(
                             child: Text(
-                              'Quản lý',
+                              'THÔNG TIN NGƯỜI GỞI',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 24.0),
                             ),
                           ),
-                          SizedBox(height: 10),
+                          SizedBox(height: 40),
                           Container(
                             margin: const EdgeInsets.only(left: 40, right: 40),
                             child: TextField(
@@ -101,9 +101,9 @@ class LoginScreenState extends State<LoginScreen> {
                               //controller: _controller,
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(),
-                                labelText: 'Họ tên',
+                                labelText: 'Tài khoản',
                                 errorText:
-                                _validate ? 'Họ tên không được rỗng' : null,
+                                _validate ? 'Tài khoản không được rỗng' : null,
                               ),
                             ),
                           ),
@@ -153,7 +153,7 @@ class LoginScreenState extends State<LoginScreen> {
                               },
                               color: Colors.green,
                               textColor: Colors.white,
-                              child: Text("Đăng nhập"),
+                              child: Text("ĐĂNG NHẬP"),
                             ) ,
                           ),
 

@@ -10,6 +10,8 @@ import 'package:intl/intl.dart';
 import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:toast/toast.dart';
+import 'package:camera/camera.dart';
 
 import 'Constants/Constants.dart';
 
@@ -23,28 +25,40 @@ class report extends StatefulWidget {
 }
 
 class _reportPageState extends State<report> {
-  String _locationMessage = "Vui lòng bấm nút lấy địa chỉ";
+  String _locationMessage = "Đang lấy địa chỉ..";
 //  String imagesAttach = "và không có ảnh được chọn";
   final TextEditingController _userController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
-  final TextEditingController _noteController = TextEditingController();
-  List<Asset> images = List<Asset>();
+   List<Asset> images = List<Asset>();
   List<String> imageUrls = <String>[];
   List<String> listUrls = <String>[];
+  List<CameraDescription> cameras;
+  CameraController controller;
   String _error;
   bool _validate = false;
   bool _validatePhone = false;
+  bool _validateLocation = false;
   bool _statusProcess = false;
   bool _selectImages = false;
   String _dropdownValue = 'Lấn đất';
-
+  dynamic _image;
 //  final databaseReference = FirebaseDatabase.instance.reference();
+
 
   @override
   void initState() {
     super.initState();
     _getCurrentLocation();
+    controller = CameraController(cameras[0], ResolutionPreset.medium);
+    controller.initialize().then((_) {
+      if (!mounted) {
+        return;
+      }
+      setState(() {});
+    });
   }
+
+
 
   Future<void> loadAssets() async {
     List<Asset> resultList = List<Asset>();
@@ -131,7 +145,6 @@ class _reportPageState extends State<report> {
       "name": _userController.text,
       "timestamp": formattedDate,
       "phone": _phoneController.text,
-      "note": _noteController.text,
       "address": _locationMessage,
       "typeprocess": _dropdownValue,
       "statusProcess": _statusProcess,
@@ -168,7 +181,7 @@ class _reportPageState extends State<report> {
           content: new SingleChildScrollView(
               child: Container(
             alignment: Alignment.center,
-            child: Text("Báo cáo thành công"),
+            child: Text("Phản ánh thành công"),
           )),
           actions: [
             new FlatButton(
@@ -213,14 +226,12 @@ class _reportPageState extends State<report> {
               children: [
                 new Text('Họ tên: ' + _userController.text),
                 SizedBox(height: 10),
-                new Text('Phone: ' + _phoneController.text),
+                new Text('Số điện thoại: ' + _phoneController.text),
                 SizedBox(height: 10),
                 new Text('địa chỉ: ' + _locationMessage),
                 SizedBox(height: 10),
                 new Text('Loại xử lý: ' + _dropdownValue),
-                SizedBox(height: 10),
-                new Text('Ghi chú: ' + _noteController.text),
-                SizedBox(height: 10),
+
               ],
             ),
           ),
@@ -274,6 +285,16 @@ class _reportPageState extends State<report> {
 
     });
   }
+  void _showToast(BuildContext context) {
+    final scaffold = Scaffold.of(context);
+    scaffold.showSnackBar(
+      SnackBar(
+        content: const Text('Added to favorite'),
+        action: SnackBarAction(
+            label: 'UNDO', onPressed: scaffold.hideCurrentSnackBar),
+      ),
+    );
+  }
 
   @override
   void dispose() {
@@ -287,7 +308,7 @@ class _reportPageState extends State<report> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Hello Appbar"),
+        title: Text("Phản ánh về đất đai môi trường"),
         actions: <Widget>[
           Padding(
               padding: EdgeInsets.only(right: 20.0, bottom: 10.0, top: 10.0),
@@ -305,9 +326,16 @@ class _reportPageState extends State<report> {
                       _phoneController.text.isEmpty
                           ? _validatePhone = true
                           : _validatePhone = false;
-                    });
 
-                    if (!_validate && !_validatePhone) {
+
+
+                    });
+                    if(_locationMessage.contains("Đang lấy địa chỉ..")){
+                      _validateLocation = true;
+                      Toast.show("Vui lòng cung cấp quyền truy cập vị trí ", context, duration: Toast.LENGTH_LONG, gravity:  Toast.CENTER);
+
+                    }
+                    if (!_validate && !_validatePhone && !_validateLocation) {
                       FocusScope.of(context).requestFocus(new FocusNode());
 
                       _showcontent();
@@ -316,7 +344,7 @@ class _reportPageState extends State<report> {
                   },
                   color: Colors.red,
                   textColor: Colors.white,
-                  child: Text("Gửi báo cáo"),
+                  child: Text("Gửi phản ánh"),
                 ),
               )),
         ],
@@ -341,7 +369,7 @@ class _reportPageState extends State<report> {
                         children: <Widget>[
                           Container(
                             child: Text(
-                              'Thông tin báo cáo',
+                              'Thông tin người phản ánh',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold, fontSize: 24.0),
                             ),
@@ -376,21 +404,12 @@ class _reportPageState extends State<report> {
                               ),
                             ),
                           ),
-                          SizedBox(height: 10),
-                          Container(
-                            margin: const EdgeInsets.only(left: 40, right: 40),
-                            child: TextField(
-                              controller: _noteController,
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                                labelText: 'Ghi chú',
-                              ),
-                            ),
-                          ),
+
+
                           SizedBox(height: 10),
                           Text(
-                            "***Vui lòng chọn loại xử lý",
-                            style: TextStyle(color: Colors.red),
+                            "Chọn nội dung cần phản ánh",
+                            style: TextStyle(color: Colors.black, fontSize: 16),
                           ),
                           Container(
                             width: 300.0,
@@ -406,9 +425,8 @@ class _reportPageState extends State<report> {
                               items: <String>[
                                 'Lấn đất',
                                 'Chiếm đất',
-                                'Xả rác thải',
+                                'Xả rác thải không đúng quy định',
                                 'Ô nhiễm không khí',
-                                'Ô nhiễm nước',
                                 'Ô nhiễm tiếng ồn',
                                 'Khai thác cát trái phép'
                               ].map<DropdownMenuItem<String>>((String value) {
@@ -439,11 +457,13 @@ class _reportPageState extends State<report> {
                                       borderRadius: BorderRadius.circular(18.0),
                                       side: BorderSide(color: Colors.green)),
                                   onPressed: () {
-                                    loadAssets();
+                                    //captureImage(ImageSource.camera)
+//                                    loadAssets();
+                                   // openCamera(context);
                                   },
                                   color: Colors.green,
                                   textColor: Colors.white,
-                                  child: Text("up hình ảnh"),
+                                  child: Text("Chụp ảnh"),
                                 ),
                               ],
                             ),

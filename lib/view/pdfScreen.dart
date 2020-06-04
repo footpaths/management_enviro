@@ -22,7 +22,7 @@ class _pdfScreenState extends State<pdfScreen> {
     loadDocument();
   }
   loadDocument() async {
-    document = await PDFDocument.fromAsset('assets/sample.pdf');
+    document = await PDFDocument.fromAsset('assets/DCQH.pdf');
 
     setState(() => _isLoading = false);
   }

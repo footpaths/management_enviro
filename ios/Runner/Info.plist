@@ -22,6 +22,11 @@ LSRequiresIPhoneOS<?xml version="1.0" encoding="UTF-8"?>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+    <string>Enable myApp to access your camera to capture your photo</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Enable myApp to access mic to record your voice</string>
+
     <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>Allow this App to access your location?</string>
 	<key>NSLocationAlwaysUsageDescription</key>
