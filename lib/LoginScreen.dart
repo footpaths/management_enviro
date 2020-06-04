@@ -111,6 +111,7 @@ class LoginScreenState extends State<LoginScreen> {
                           Container(
                             margin: const EdgeInsets.only(left: 40, right: 40),
                             child: TextField(
+                              obscureText: true,
                               controller: _passController,
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(),

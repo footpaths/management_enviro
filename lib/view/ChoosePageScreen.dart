@@ -28,7 +28,7 @@ class ChoosePageScreenState extends State<ChoosePageScreen> {
         }
         else{
           //signed in
-          print('roi');
+          print('roi'+firebaseUser.email);
           MyNavigator.goToHome(context);
 //          Navigator.of(context).pushReplacementNamed('/login');
 //          Navigator.of(context).push(new MaterialPageRoute(builder: (_) => new MyHomePage()));

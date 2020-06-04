@@ -7,22 +7,35 @@ class reportModel {
   String note;
   String address;
   String typeprocess;
+  String personProcess;
+  String individualKey;
   bool statusProcess;
 
   dynamic images = new List<String>();
 
-  reportModel(this.name,this.timestamp,this.phone,this.note,this.address,this.typeprocess,this.statusProcess, this.images);
+  reportModel(
+      this.name,
+      this.timestamp,
+      this.phone,
+      this.note,
+      this.address,
+      this.typeprocess,
+      this.statusProcess,
+      this.individualKey,
+      this.images,
+      this.personProcess);
 
   reportModel.fromSnapshot(DataSnapshot snapshot)
       : name = snapshot.value["name"],
-        timestamp= snapshot.value["timestamp"],
-        phone= snapshot.value["phone"],
-        note= snapshot.value["note"],
-        address= snapshot.value["address"],
-        typeprocess= snapshot.value["typeprocess"],
-        statusProcess= snapshot.value["statusProcess"],
-        images = snapshot.value["images"];
-
+        timestamp = snapshot.value["timestamp"],
+        phone = snapshot.value["phone"],
+        note = snapshot.value["note"],
+        address = snapshot.value["address"],
+        typeprocess = snapshot.value["typeprocess"],
+        statusProcess = snapshot.value["statusProcess"],
+        individualKey = snapshot.key,
+        images = snapshot.value["images"],
+        personProcess = snapshot.value["personProcess"];
 
   toJson() {
     return {
@@ -33,7 +46,9 @@ class reportModel {
       "address": address,
       "typeprocess": typeprocess,
       "statusProcess": statusProcess,
+      "individualKey": individualKey,
       "images": images,
+      "personProcess": personProcess,
     };
   }
 }

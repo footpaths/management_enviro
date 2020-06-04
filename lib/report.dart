@@ -136,6 +136,7 @@ class _reportPageState extends State<report> {
       "typeprocess": _dropdownValue,
       "statusProcess": _statusProcess,
       "images": listUrls,
+      "personProcess": "",
     }).then((val) {
       print('aaaaaaaaa thanh cong');
       _showDialogSuccess();

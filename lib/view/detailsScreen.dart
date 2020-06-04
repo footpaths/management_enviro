@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:environmental_management/utils/my_navigator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 import 'package:flutter/material.dart';
@@ -21,7 +22,14 @@ class detailsScreen extends StatefulWidget {
 }
 
 class _detailsScreenState extends State<detailsScreen> {
-  String name, timestamp, phone, note, address, typeprocess;
+  String name,
+      timestamp,
+      phone,
+      note,
+      address,
+      typeprocess,
+      individualKey,
+      personProcess;
   bool statusProcess;
   dynamic images = new List<String>();
   int _current = 0;
@@ -29,10 +37,13 @@ class _detailsScreenState extends State<detailsScreen> {
   final PageController controller = PageController();
   var msgStatusProcess;
   final FirebaseDatabase _database = FirebaseDatabase.instance;
+  bool _isVisible = true;
+  String personPro;
 
   @override
   void initState() {
     // TODO: implement initState
+
     super.initState();
     controller.addListener(() {
       if (controller.page.round() != _current) {
@@ -41,16 +52,77 @@ class _detailsScreenState extends State<detailsScreen> {
         });
       }
     });
+    setState(() {
+      FirebaseAuth.instance.currentUser().then((firebaseUser){
+        if(firebaseUser == null)
+        {
+          //signed out
+
+        }
+        else{
+          //signed in
+         personPro =  firebaseUser.email;
+         print('aaaa'+ personPro);
+//          Navigator.of(context).pushReplacementNamed('/login');
+//          Navigator.of(context).push(new MaterialPageRoute(builder: (_) => new MyHomePage()));
+
+        }
+      });
+    }
+    );
   }
+
   @override
   void dispose() {
     controller.dispose();
 
     super.dispose();
   }
- void processUpdate(){
-   //_database.reference().child("chats").child(todo.key).set(todo.toJson());
- }
+  void _showDialogSuccess() {
+    showDialog(
+      context: context, barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return new AlertDialog(
+          title: Container(
+            alignment: Alignment.center,
+            child: new Text(
+              'Xác nhận!!!',
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+          content: new SingleChildScrollView(
+              child: Container(
+                alignment: Alignment.center,
+                child: Text("xử lý thành công"),
+              )),
+          actions: [
+            new FlatButton(
+              child: new Text('Đồng ý'),
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.of(context).pop();
+
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+  void processUpdate() {
+
+    _database
+        .reference()
+        .child("chats")
+        .child(individualKey)
+        .update({"statusProcess": true, "personProcess": personPro}).then((val) {
+      print('aaaaaaaaa thanh cong');
+      _showDialogSuccess();
+//      Navigator.pop(context);
+    });
+
+  }
+
   @override
   Widget build(BuildContext context) {
     final Map arguments = ModalRoute.of(context).settings.arguments as Map;
@@ -63,19 +135,20 @@ class _detailsScreenState extends State<detailsScreen> {
       this.address = arguments['address'];
       this.typeprocess = arguments['typeprocess'];
       this.statusProcess = arguments['statusProcess'];
+      this.individualKey = arguments['individualKey'];
       this.images = arguments['images'];
+      this.personProcess = arguments['personProcess'];
     }
-
 
     for (var name in images) {
       listImg.add(name);
     }
-    print('in'+ listImg.length.toString());
-    if (statusProcess){
-      msgStatusProcess ="Đã xử lý";
-
-    }else{
-      msgStatusProcess ="Chưa xử lý";
+    print('in' + listImg.length.toString());
+    if (statusProcess) {
+      msgStatusProcess = "Đã xử lý";
+      _isVisible = false;
+    } else {
+      msgStatusProcess = "Chưa xử lý";
     }
 
     // print(arguments['images']);
@@ -116,12 +189,11 @@ class _detailsScreenState extends State<detailsScreen> {
                                     fit: BoxFit.cover, width: 1000),
                                 onTap: () {
                                   print('lick ' + item);
-                                  MyNavigator.goToFullScreen(context,item);
+                                  MyNavigator.goToFullScreen(context, item);
                                 },
                               )))
                           .toList(),
                     ),
-
                   ],
                 )),
                 SizedBox(height: 20),
@@ -149,21 +221,30 @@ class _detailsScreenState extends State<detailsScreen> {
                 SizedBox(height: 10),
                 // ignore: unrelated_type_equality_checks
                 Text("Trạng thái: " + msgStatusProcess,
-                    style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                    style: TextStyle(
+                        color: Colors.red, fontWeight: FontWeight.bold)),
                 SizedBox(height: 10),
-                Container(
-                  alignment: Alignment.center,
-                  child: RaisedButton(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(18.0),
-                        side: BorderSide(color: Colors.green)),
-                    onPressed: () {
-                      processUpdate();
-                      //_showcontent();
-                    },
-                    color: Colors.green,
-                    textColor: Colors.white,
-                    child: Text("Xử lý "),
+                Visibility(
+                  visible: !_isVisible,
+                  child: Text("Người Xử lý: " + personProcess),
+                ),
+
+                Visibility(
+                  visible: _isVisible,
+                  child: Container(
+                    alignment: Alignment.center,
+                    child: RaisedButton(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18.0),
+                          side: BorderSide(color: Colors.green)),
+                      onPressed: () {
+                        processUpdate();
+                        //_showcontent();
+                      },
+                      color: Colors.green,
+                      textColor: Colors.white,
+                      child: Text("Xử lý "),
+                    ),
                   ),
                 ),
               ],
