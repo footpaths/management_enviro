@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:io';
+import 'dart:typed_data';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:geolocator/geolocator.dart';
@@ -11,9 +13,11 @@ import 'package:multi_image_picker/multi_image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:toast/toast.dart';
-import 'package:camera/camera.dart';
 
 import 'Constants/Constants.dart';
+import 'Constants/icon_image.dart';
+import 'picker/camera.dart';
+import 'package:image_picker/image_picker.dart';
 
 class report extends StatefulWidget {
   final GlobalKey<ScaffoldState> globalKey;
@@ -30,37 +34,44 @@ class _reportPageState extends State<report> {
   final TextEditingController _userController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
    List<Asset> images = List<Asset>();
+   List<ByteData> imagesNew = [];
   List<String> imageUrls = <String>[];
   List<String> listUrls = <String>[];
-  List<CameraDescription> cameras;
-  CameraController controller;
+
   String _error;
   bool _validate = false;
   bool _validatePhone = false;
   bool _validateLocation = false;
+  bool _validateImage = false;
   bool _statusProcess = false;
   bool _selectImages = false;
   String _dropdownValue = 'Lấn đất';
-  dynamic _image;
+  int counter = 0;
 //  final databaseReference = FirebaseDatabase.instance.reference();
+  final picker = ImagePicker();
+  File _image;
 
+  List<File> img =  [];
 
+  Future getImage() async {
+    final pickedFile = await picker.getImage(source: ImageSource.camera);
+     setState(() {
+      _image = File(pickedFile.path);
+      img.add(_image);
+      print('aaaaaa'+ _image.path);
+      counter++;
+    });
+  }
   @override
   void initState() {
     super.initState();
     _getCurrentLocation();
-    controller = CameraController(cameras[0], ResolutionPreset.medium);
-    controller.initialize().then((_) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {});
-    });
+
   }
 
 
 
-  Future<void> loadAssets() async {
+ /* Future<void> loadAssets() async {
     List<Asset> resultList = List<Asset>();
     String error = 'No Error Dectected';
 
@@ -92,25 +103,38 @@ class _reportPageState extends State<report> {
       _error = error;
     });
   }
+  void openCamera(context) async {
+    final image = await CustomCamera.openCamera();
 
-  Future<dynamic> postImage(Asset imageFile) async {
+    setState(() {
+      _image = image;
+
+
+      *//*  Uint8List bytes = image.readAsBytesSync();
+      imagesNew.add(ByteData.view(bytes.buffer));
+      print('ddddddddddd'+imagesNew.length.toString());
+      print('ccccccc'+ _image.toString());*//*
+      print('ccccccc'+ _image.toString());
+    });
+  }*/
+  Future<dynamic> postImage(File imageFile) async {
     String fileName = DateTime.now().millisecondsSinceEpoch.toString();
     StorageReference reference = FirebaseStorage.instance.ref().child(fileName);
     StorageUploadTask uploadTask =
-        reference.putData((await imageFile.getByteData()).buffer.asUint8List());
+        reference.putFile(imageFile);
     StorageTaskSnapshot storageTaskSnapshot = await uploadTask.onComplete;
     String imageUrl = await storageTaskSnapshot.ref.getDownloadURL();
     print('aaaaaaaa' + imageUrl);
     listUrls.add(imageUrl);
     print("sizeeeeeeeeeeee" + listUrls.length.toString());
-    if (listUrls.length == images.length) {
+    if (listUrls.length == img.length) {
       updateRecord();
     }
     return storageTaskSnapshot.ref.getDownloadURL();
   }
 
   void uploadImages() {
-    for (var imageFile in images) {
+    for (var imageFile in img) {
       postImage(imageFile).then((downloadUrl) {
         imageUrls.add(downloadUrl.toString());
         if (imageUrls.length == images.length) {
@@ -135,10 +159,7 @@ class _reportPageState extends State<report> {
   void updateRecord() {
     DateTime now = DateTime.now();
     String formattedDate = DateFormat('yyyy-MM-dd – hh:mm').format(now);
-    if (listUrls.length > 0) {
-    } else {
-      listUrls.add("nodata");
-    }
+
 
     var _firebaseRef = FirebaseDatabase().reference().child('chats');
     _firebaseRef.push().set({
@@ -159,11 +180,9 @@ class _reportPageState extends State<report> {
   }
 
   void createRecord() {
-    if (images.length > 0) {
+
       uploadImages();
-    } else {
-      updateRecord();
-    }
+
   }
 
   void _showDialogSuccess() {
@@ -259,17 +278,14 @@ class _reportPageState extends State<report> {
     _selectImages = true;
     return GridView.count(
       crossAxisCount: 3,
-      children: List.generate(images.length, (index) {
-        Asset asset = images[index];
-        return AssetThumb(
-          asset: asset,
-          width: 200,
-          height: 200,
-        );
-      }),
+      children: List.generate(img.length, (index) {
+        File asset = img[index];
+        return new Image.file(asset);
+      }
+      ),
     );
   }
-
+//  new Image.file(_image)
   void _getCurrentLocation() async {
     final Position position = await Geolocator()
         .getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
@@ -285,16 +301,7 @@ class _reportPageState extends State<report> {
 
     });
   }
-  void _showToast(BuildContext context) {
-    final scaffold = Scaffold.of(context);
-    scaffold.showSnackBar(
-      SnackBar(
-        content: const Text('Added to favorite'),
-        action: SnackBarAction(
-            label: 'UNDO', onPressed: scaffold.hideCurrentSnackBar),
-      ),
-    );
-  }
+
 
   @override
   void dispose() {
@@ -334,11 +341,21 @@ class _reportPageState extends State<report> {
                       _validateLocation = true;
                       Toast.show("Vui lòng cung cấp quyền truy cập vị trí ", context, duration: Toast.LENGTH_LONG, gravity:  Toast.CENTER);
 
+                    }else{
+                      _validateLocation = false;
                     }
-                    if (!_validate && !_validatePhone && !_validateLocation) {
+                    if(_image == null){
+                      _validateImage = true;
+                      Toast.show("Chụp ảnh xác thực phản ánh", context, duration: Toast.LENGTH_LONG, gravity:  Toast.CENTER);
+                    }else{
+                      _validateImage = false;
+                    }
+                    if (!_validate && !_validatePhone && !_validateLocation && !_validateImage) {
                       FocusScope.of(context).requestFocus(new FocusNode());
 
                       _showcontent();
+                    }else{
+                      Toast.show("Vui lòng cung cấp đầy đủ thông tin"+_image.path, context, duration: Toast.LENGTH_LONG, gravity:  Toast.CENTER);
                     }
                     //_showcontent();
                   },
@@ -460,6 +477,12 @@ class _reportPageState extends State<report> {
                                     //captureImage(ImageSource.camera)
 //                                    loadAssets();
                                    // openCamera(context);
+                                    if(counter > 2){
+                                      Toast.show("không vượt quá 3 hình", context, duration: Toast.LENGTH_LONG, gravity:  Toast.CENTER);
+                                    }else{
+                                      getImage();
+                                    }
+
                                   },
                                   color: Colors.green,
                                   textColor: Colors.white,
@@ -469,10 +492,39 @@ class _reportPageState extends State<report> {
                             ),
                           ),
                           SizedBox(height: 10),
+
+
+
+
+
                           Container(
                             height: 200,
-                            child: buildGridView(),
-                          )
+                            child: Container(
+                              child: new Center(
+                                child: _image == null
+                                    ? new Text('Chưa có ảnh được chọn')
+                                    : GridView.count(
+                                  crossAxisCount: 3,
+                                  padding: EdgeInsets.only(bottom: 5),
+                                  children: List.generate(img.length, (index) {
+                                    File asset = img[index];
+                                    return new Image.file(asset);
+                                  }
+                                  ),
+                                ),
+                              ),
+
+                           /*   decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                      image: _image == null
+                                          ? AssetImage('assets/images/add.png')
+                                          : Image.file(_image),
+                                      fit: BoxFit.cover)),*/
+                            )
+//                             buildGridView()
+//
+                          ),
+//                          buildGridView()
                         ],
                       ),
                     ),
